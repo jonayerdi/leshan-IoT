@@ -52,14 +52,29 @@ public class ObjectLoader {
     public static List<ObjectModel> loadDefault() {
         List<ObjectModel> models = new ArrayList<>();
 
-        // standard objects
-        LOG.debug("Loading OMA standard object models");
-        InputStream input = ObjectLoader.class.getResourceAsStream("/oma-objects-spec.json");
-        if (input != null) {
-            try (Reader reader = new InputStreamReader(input)) {
-                models.addAll(loadJsonStream(input));
-            } catch (IOException e) {
-                LOG.error("Unable to load object models", e);
+        {
+            // standard objects
+            LOG.info("Loading OMA standard object models");
+            InputStream input = ObjectLoader.class.getResourceAsStream("/oma-objects-spec.json");
+            if (input != null) {
+                try (Reader reader = new InputStreamReader(input)) {
+                    models.addAll(loadJsonStream(input));
+                } catch (IOException e) {
+                    LOG.error("Unable to load object models", e);
+                }
+            }
+        }
+
+        {
+            // custom IoT project objects
+            LOG.info("Loading Iot project custom object models");
+            InputStream input = ObjectLoader.class.getResourceAsStream("/objectspec.json");
+            if (input != null) {
+                try (Reader reader = new InputStreamReader(input)) {
+                    models.addAll(loadJsonStream(input));
+                } catch (IOException e) {
+                    LOG.error("Unable to load object models", e);
+                }
             }
         }
 

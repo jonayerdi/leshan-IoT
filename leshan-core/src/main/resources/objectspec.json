@@ -9,7 +9,7 @@
       {
         "id": 0,
         "name": "Light ID",
-        "operations": "RW",
+        "operations": "R",
         "instancetype": "single",
         "mandatory": false,
         "type": "string",
@@ -20,7 +20,7 @@
       {
         "id": 1,
         "name": "Device Type",
-        "operations": "RW",
+        "operations": "R",
         "instancetype": "single",
         "mandatory": false,
         "type": "string",
@@ -138,6 +138,28 @@
         "units": "",
         "description": ""
       }
+	  {
+        "id": 12,
+        "name": "Ownership Priority",
+        "operations": "W",
+        "instancetype": "single",
+        "mandatory": false,
+        "type": "string",
+        "range": "",
+        "units": "",
+        "description": ""
+      }
+	  {
+        "id": 13,
+        "name": "Light Behavior",
+        "operations": "W",
+        "instancetype": "single",
+        "mandatory": false,
+        "type": "string",
+        "range": "",
+        "units": "",
+        "description": ""
+      }
     ]
   },
   {
@@ -150,7 +172,7 @@
       {
         "id": 0,
         "name": "Sensor ID",
-        "operations": "RW",
+        "operations": "R",
         "instancetype": "single",
         "mandatory": false,
         "type": "string",
@@ -161,7 +183,7 @@
       {
         "id": 1,
         "name": "Device Type",
-        "operations": "RW",
+        "operations": "R",
         "instancetype": "single",
         "mandatory": false,
         "type": "string",
