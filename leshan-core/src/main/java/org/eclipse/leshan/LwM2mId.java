@@ -31,6 +31,8 @@ public interface LwM2mId {
     public static final int LOCATION = 6;
     public static final int CONNECTIVITY_STATISTICS = 7;
     public static final int SOFTWARE_MANAGEMENT = 9;
+    public static final int LIGHT_PROFILE = 10250;
+    public static final int SENSOR_PROFILE = 10350;
 
     /* SECURITY RESOURCES */
 
