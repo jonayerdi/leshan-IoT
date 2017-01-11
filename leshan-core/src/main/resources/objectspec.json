@@ -137,7 +137,7 @@
         "range": "",
         "units": "",
         "description": ""
-      }
+      },
 	  {
         "id": 12,
         "name": "Ownership Priority",
@@ -148,7 +148,7 @@
         "range": "",
         "units": "",
         "description": ""
-      }
+      },
 	  {
         "id": 13,
         "name": "Light Behavior",
