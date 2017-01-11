@@ -18,10 +18,7 @@
 
 package org.eclipse.leshan.client.demo;
 
-import static org.eclipse.leshan.LwM2mId.DEVICE;
-import static org.eclipse.leshan.LwM2mId.LOCATION;
-import static org.eclipse.leshan.LwM2mId.SECURITY;
-import static org.eclipse.leshan.LwM2mId.SERVER;
+import static org.eclipse.leshan.LwM2mId.*;
 import static org.eclipse.leshan.client.object.Security.noSec;
 import static org.eclipse.leshan.client.object.Security.noSecBootstap;
 import static org.eclipse.leshan.client.object.Security.psk;
@@ -188,7 +185,8 @@ public class LeshanClientDemo {
         }
         initializer.setClassForObject(DEVICE, MyDevice.class);
         initializer.setInstancesForObject(LOCATION, locationInstance);
-        List<LwM2mObjectEnabler> enablers = initializer.create(SECURITY, SERVER, DEVICE, LOCATION);
+        initializer.setClassForObject(LIGHT_PROFILE, MyLight.class);
+        List<LwM2mObjectEnabler> enablers = initializer.create(SECURITY, SERVER, DEVICE, LOCATION, LIGHT_PROFILE);
 
         // Create client
         LeshanClientBuilder builder = new LeshanClientBuilder(endpoint);
