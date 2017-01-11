@@ -59,9 +59,9 @@ public class MyLight extends BaseInstanceEnabler {
             case 7:
                 return ReadResponse.success(resourceid, groupNo);
             case 8:
-                return ReadResponse.success(resourceid, locationX);
+                return ReadResponse.success(resourceid, new Random().nextFloat());
             case 9:
-                return ReadResponse.success(resourceid, locationY);
+                return ReadResponse.success(resourceid, new Random().nextFloat());
             case 10:
                 return ReadResponse.success(resourceid, roomId);
             case 11:
