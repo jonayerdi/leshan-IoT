@@ -16,10 +16,10 @@ public class MyLight extends BaseInstanceEnabler {
 
     private static final Logger LOG = LoggerFactory.getLogger(MyDevice.class);
 
-    int groupNo;
+    long groupNo;
     String lightId, deviceType, lightState, userType, userId, lightColor, roomId, behaviorDeployment, ownershipProperty, lightBehavior;
     boolean lowLight;
-    float locationX, locationY;
+    double locationX, locationY;
 
     public MyLight() {
         lightId = "Light" + new Random().nextInt(1000);
@@ -104,15 +104,15 @@ public class MyLight extends BaseInstanceEnabler {
                 fireResourcesChange(resourceid);
                 return WriteResponse.success();
             case 7:
-                groupNo = (Integer)value.getValue();
+                groupNo = (Long)value.getValue();
                 fireResourcesChange(resourceid);
                 return WriteResponse.success();
             case 8:
-                locationX = (Float)value.getValue();
+                locationX = (Double)value.getValue();
                 fireResourcesChange(resourceid);
                 return WriteResponse.success();
             case 9:
-                locationY = (Float)value.getValue();
+                locationY = (Double)value.getValue();
                 fireResourcesChange(resourceid);
                 return WriteResponse.success();
             case 10:

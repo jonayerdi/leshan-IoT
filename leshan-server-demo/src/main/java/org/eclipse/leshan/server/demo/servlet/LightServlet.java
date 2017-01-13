@@ -4,14 +4,18 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.leshan.LinkObject;
+import org.eclipse.leshan.ResponseCode;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.ReadRequest;
+import org.eclipse.leshan.core.request.WriteRequest;
 import org.eclipse.leshan.core.request.exception.RequestFailedException;
 import org.eclipse.leshan.core.request.exception.ResourceAccessException;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
+import org.eclipse.leshan.core.response.WriteResponse;
 import org.eclipse.leshan.server.LwM2mServer;
 import org.eclipse.leshan.server.client.Client;
 import org.eclipse.leshan.server.demo.serializers.ClientFormat;
@@ -29,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 
 /**
  * Created by Jon Ayerdi on 13/01/2017.
@@ -83,6 +88,26 @@ public class LightServlet extends HttpServlet {
                     getLightData(req, resp, client);
                     return;
                 }
+                // /api/lights/<light_endpoint>/<resource_id>
+                int rid = 0;
+                try {
+                    rid = Integer.valueOf(path[1]);
+                } catch (Exception e) {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    resp.getWriter().append("Resource id must be an integer").flush();
+                    return;
+                }
+                if (path.length == 2) {
+                    getLightData(req, resp, client, rid);
+                    return;
+                }
+                // /api/lights/<light_endpoint>/<resource_id>/set
+                if (path.length == 3 && path[2].equals("set")) {
+                    setLightData(req, resp, client, rid);
+                    return;
+                }
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().append("Invalid URL").flush();
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().format("no registered client with id '%s'", clientEndpoint).flush();
@@ -100,9 +125,9 @@ public class LightServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().append(e.getMessage()).flush();
         } catch (Exception e) {
-            LOG.warn("Exception", e);
+            LOG.warn("Exception: " + e.getClass().getName());
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().append(e.getMessage()).flush();
+            resp.getWriter().append("Exception: " + e.getClass().getName()).flush();
         }
     }
 
@@ -149,6 +174,40 @@ public class LightServlet extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_OK);
     }
 
+    // /api/lights/<light_endpoint>/<resource_id>
+    // Get the LWM2M light data from light_endpoint
+    public void getLightData(HttpServletRequest req, HttpServletResponse resp, Client client, int rid) throws Exception {
+        resp.setContentType("application/json");
+        String json = "{";
+        json += "\"";
+        json += LIGHT_RESOURCES[rid];
+        json += "\":";
+        json += "\"";
+        json += getLightResource(client,rid);
+        json += "\"";
+        json += "}";
+        resp.getOutputStream().write(json.getBytes("UTF-8"));
+        resp.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    // /api/lights/<light_endpoint>/<resource_id>/set
+    // Set the LWM2M light data from light_endpoint
+    public void setLightData(HttpServletRequest req, HttpServletResponse resp, Client client, int rid) throws Exception {
+        String value = req.getParameter("value");
+        if(value==null) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().append("No value attribute").flush();
+            return;
+        }
+        if(rid<2 || rid>13) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().append("Cannot write to resource, bad id").flush();
+            return;
+        }
+        setLightResource(client,rid,value);
+        resp.setStatus(HttpServletResponse.SC_OK);
+    }
+
     public String getLightResource(Client c, int rid) throws Exception {
         // create & process request for resource
         ReadRequest request = new ReadRequest(null, "/10250/0/"+rid);
@@ -156,6 +215,30 @@ public class LightServlet extends HttpServlet {
         String val = "";
         if(cResponse!=null) val = ((LwM2mResource)cResponse.getContent()).getValue().toString();
         return val;
+    }
+
+    public void setLightResource(Client c, int rid, String value) throws Exception {
+        // create & process request for resource
+        WriteRequest request = new WriteRequest(WriteRequest.Mode.REPLACE, null
+                , "/10250/0/"+rid, cast(rid,value));
+        WriteResponse cResponse = server.send(c, request, TIMEOUT);
+        if(cResponse==null || cResponse.getCode()!= ResponseCode.CHANGED)
+            throw new RequestFailedException("Request failed");
+    }
+
+    public LwM2mSingleResource cast(int rid, String value) throws Exception {
+        switch(rid) {
+            case 6:
+                return LwM2mSingleResource.newBooleanResource(rid, Boolean.valueOf(value));
+            case 7:
+                return LwM2mSingleResource.newIntegerResource(rid, Integer.valueOf(value));
+            case 8:
+                return LwM2mSingleResource.newFloatResource(rid, Float.valueOf(value));
+            case 9:
+                return LwM2mSingleResource.newFloatResource(rid, Float.valueOf(value));
+            default:
+                return LwM2mSingleResource.newStringResource(rid, value);
+        }
     }
 
 }
