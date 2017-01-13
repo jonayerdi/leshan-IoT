@@ -16,28 +16,7 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.demo;
 
-import java.math.BigInteger;
-import java.net.BindException;
-import java.net.URI;
-import java.security.AlgorithmParameters;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.spec.ECGenParameterSpec;
-import java.security.spec.ECParameterSpec;
-import java.security.spec.ECPoint;
-import java.security.spec.ECPrivateKeySpec;
-import java.security.spec.ECPublicKeySpec;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.InvalidParameterSpecException;
-import java.security.spec.KeySpec;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -48,23 +27,29 @@ import org.eclipse.leshan.server.californium.LeshanServerBuilder;
 import org.eclipse.leshan.server.californium.impl.CaliforniumObservationRegistryImpl;
 import org.eclipse.leshan.server.californium.impl.LeshanServer;
 import org.eclipse.leshan.server.client.ClientRegistry;
-import org.eclipse.leshan.server.demo.cluster.RedisObservationStore;
 import org.eclipse.leshan.server.demo.cluster.RedisClientRegistry;
+import org.eclipse.leshan.server.demo.cluster.RedisObservationStore;
 import org.eclipse.leshan.server.demo.cluster.RedisSecurityRegistry;
 import org.eclipse.leshan.server.demo.servlet.ClientServlet;
 import org.eclipse.leshan.server.demo.servlet.EventServlet;
 import org.eclipse.leshan.server.demo.servlet.ObjectSpecServlet;
 import org.eclipse.leshan.server.demo.servlet.SecurityServlet;
+import org.eclipse.leshan.server.demo.servlet.LightServlet;
 import org.eclipse.leshan.server.impl.SecurityRegistryImpl;
 import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.model.StandardModelProvider;
 import org.eclipse.leshan.util.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.util.Pool;
+
+import java.math.BigInteger;
+import java.net.BindException;
+import java.net.URI;
+import java.security.*;
+import java.security.spec.*;
 
 public class LeshanServerDemo {
 
@@ -253,6 +238,10 @@ public class LeshanServerDemo {
 
         ServletHolder objectSpecServletHolder = new ServletHolder(new ObjectSpecServlet(lwServer.getModelProvider()));
         root.addServlet(objectSpecServletHolder, "/api/objectspecs/*");
+
+        ServletHolder lightServletHolder = new ServletHolder(
+                new LightServlet(lwServer));
+        root.addServlet(lightServletHolder, "/api/lights/*");
 
         // Start Jetty & Leshan
         lwServer.start();

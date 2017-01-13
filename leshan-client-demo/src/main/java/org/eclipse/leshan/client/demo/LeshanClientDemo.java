@@ -187,7 +187,7 @@ public class LeshanClientDemo {
         initializer.setInstancesForObject(LOCATION, locationInstance);
         initializer.setClassForObject(LIGHT_PROFILE, MyLight.class);
         initializer.setClassForObject(SENSOR_PROFILE, MySensor.class);
-        List<LwM2mObjectEnabler> enablers = initializer.create(SECURITY, SERVER, LIGHT_PROFILE, SENSOR_PROFILE);
+        List<LwM2mObjectEnabler> enablers = initializer.create(SECURITY, SERVER, LOCATION, LIGHT_PROFILE, SENSOR_PROFILE);
 
         // Create client
         LeshanClientBuilder builder = new LeshanClientBuilder(endpoint);

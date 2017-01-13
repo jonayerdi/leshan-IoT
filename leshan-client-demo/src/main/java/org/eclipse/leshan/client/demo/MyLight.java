@@ -16,13 +16,13 @@ public class MyLight extends BaseInstanceEnabler {
 
     private static final Logger LOG = LoggerFactory.getLogger(MyDevice.class);
 
-    int lightId, groupNo;
-    String deviceType, lightState, userType, userId, lightColor, roomId, behaviorDeployment, ownershipProperty, lightBehavior;
+    int groupNo;
+    String lightId, deviceType, lightState, userType, userId, lightColor, roomId, behaviorDeployment, ownershipProperty, lightBehavior;
     boolean lowLight;
     float locationX, locationY;
 
     public MyLight() {
-        lightId = new Random().nextInt(1000);
+        lightId = "Light" + new Random().nextInt(1000);
         deviceType = "Light Device";
         lightState = "FREE";
         userType = "USER"+(new Random().nextInt(3)+1);

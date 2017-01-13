@@ -70,7 +70,7 @@ public class ClientRegistryImpl implements ClientRegistry, Startable, Stoppable 
     public boolean registerClient(Client client) {
         Validate.notNull(client);
 
-        LOG.debug("Registering new client: {}", client);
+        LOG.info("Registering new client: {}", client);
 
         Client previous = clientsByEp.put(client.getEndpoint(), client);
         if (previous != null) {
@@ -109,7 +109,7 @@ public class ClientRegistryImpl implements ClientRegistry, Startable, Stoppable 
     public Client deregisterClient(String registrationId) {
         Validate.notNull(registrationId);
 
-        LOG.debug("Deregistering client with registrationId: {}", registrationId);
+        LOG.info("Deregistering client with registrationId: {}", registrationId);
 
         Client toBeUnregistered = findByRegistrationId(registrationId);
         if (toBeUnregistered == null) {

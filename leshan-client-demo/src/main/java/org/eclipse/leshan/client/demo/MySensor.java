@@ -17,13 +17,12 @@ public class MySensor extends BaseInstanceEnabler {
 
     private static final Logger LOG = LoggerFactory.getLogger(MyDevice.class);
 
-    int sensorId, groupNo;
-    String deviceType, sensorState, userId, lightColor, roomId, behaviorDeployment, ownershipProperty, lightBehavior;
-    boolean lowLight;
+    int groupNo;
+    String sensorId, deviceType, sensorState, userId, roomId;
     float locationX, locationY;
 
     public MySensor() {
-        sensorId = new Random().nextInt(1000);
+        sensorId = "Sensor" + new Random().nextInt(1000);
         deviceType = "Sensor Device";
         sensorState = "FREE";
         userId = "Office-Worker-"+new Random().nextInt(50);

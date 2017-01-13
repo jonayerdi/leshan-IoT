@@ -101,10 +101,10 @@ public class EventServlet extends EventSourceServlet {
 
         @Override
         public void newValue(Observation observation, LwM2mNode value, List<TimestampedLwM2mNode> timestampedValues) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Received notification from [{}] containing value [{}]", observation.getPath(),
+            //if (LOG.isDebugEnabled()) {
+                LOG.info("Received notification from [{}] containing value [{}]", observation.getPath(),
                         value.toString());
-            }
+            //}
             Client client = server.getClientRegistry().findByRegistrationId(observation.getRegistrationId());
 
             if (client != null) {
