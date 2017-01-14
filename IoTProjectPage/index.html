@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"> 
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.0/css/bootstrap-slider.css">
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.0/bootstrap-slider.js"></script>
+		<script type="text/javascript" src="js/main.js"></script>
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<h1 id="title">IoT Light Control</h1>
+			</div>
+			<div class="row form-inline">
+				<label>Light endpoint:</label>
+				<input id="endpoint" type="text" class="form-control"/>
+			</div>
+			<br></br>
+			<div class="row col-xs-12">
+				<div class="well">
+					<p>
+						<b>R</b>
+						<input id="RSlider" type="text" class="span2" value="" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="0" data-slider-id="RC" data-slider-tooltip="hide" data-slider-handle="square">
+					</p>
+					<p>
+						<b>G</b>
+						<input id="GSlider" type="text" class="span2" value="" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="0" data-slider-id="GC" data-slider-tooltip="hide" data-slider-handle="round">
+					</p>
+					<p>
+						<b>B</b>
+						<input id="BSlider" type="text" class="span2" value="" data-slider-min="0" data-slider-max="255" data-slider-step="1" data-slider-value="0" data-slider-id="BC" data-slider-tooltip="hide" data-slider-handle="triangle">
+					</p>
+				<div id="RGB" style="background: rgb(203, 157, 78);"></div>
+				</div>
+			</div>
+			<div class="row col-xs-12">
+				<b>Low Light:</b>
+				<input id="lowLight" type="checkbox" onchange="lowLight()" style="height:20px; width:20px;"/>
+			</div>
+		</div>
+	</body>
+</html>
