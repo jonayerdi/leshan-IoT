@@ -7,13 +7,40 @@ var $endpoint;
 var $lowLight;
 var endpointsUpdateIntervalID;
 
+function updateLightValues() {
+	$.ajax({
+		url: 'http://'+address+'/api/lights/'+$endpoint.val()+'/6',
+		success: function(data) {
+			var json = eval(data);
+			$lowLight.prop('checked',json["Low Light"])
+		},
+		failure: function(data) { 
+			
+		}
+	});
+	$.ajax({
+		url: 'http://'+address+'/api/lights/'+$endpoint.val()+'/5',
+		success: function(data) {
+			var json = eval(data);
+			var color = json["Light Color"];
+			var colors = color.substring(1,color.length-1).split(',');
+			RS.slider('setValue',colors[0]);
+			GS.slider('setValue',colors[1]);
+			BS.slider('setValue',colors[2]);
+		},
+		failure: function(data) { 
+			
+		}
+	});
+}
+
 function visualizeEndpoints(json) {
 	$endpoints_list.empty();
 	for(var i = 0 ; i < json.length ; i++) {
 		var client = json[i];
 		var e = client["endpoint"];
 		//Update view
-		var list_item = "<li class=\"list-group-item\" onclick=\"$endpoint.val('"+e+"');\">"+e+"</li>";
+		var list_item = "<li class=\"list-group-item\" onclick=\"$endpoint.val('"+e+"'); updateLightValues();\">"+e+"</li>";
 		$endpoints_list.append(list_item);
 	}
 }
@@ -23,8 +50,6 @@ function updateEndpoints() {
 		url: 'http://'+address+'/api/lights',
 		success: function(data) {
 			var json = eval(data);
-			alert(data);
-			alert(json);
 			visualizeEndpoints(json);
 		},
 		failure: function(data) { 

@@ -1,9 +1,9 @@
 
 .list-group {
 	overflow: auto;
-	height: 100px;
+	height: 120px;
 }
 
 .list-group-item {
-	font-size: 20px;
+	font-size: 16px;
 }

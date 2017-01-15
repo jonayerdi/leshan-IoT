@@ -27,7 +27,7 @@ public class MyLight extends BaseInstanceEnabler {
         lightState = "FREE";
         userType = "USER"+(new Random().nextInt(3)+1);
         userId = "Office-Worker-"+new Random().nextInt(50);
-        lightColor = "(255,255,255)";
+        lightColor = "(100,35,200)";
         lowLight = true;
         groupNo = new Random().nextInt(1000);
         locationX = new Random().nextFloat();
