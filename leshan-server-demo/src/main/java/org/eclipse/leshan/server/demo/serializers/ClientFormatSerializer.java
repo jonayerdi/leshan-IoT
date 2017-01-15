@@ -15,7 +15,6 @@ public class ClientFormatSerializer implements JsonSerializer<ClientFormat> {
     public JsonElement serialize(ClientFormat src, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject element = new JsonObject();
 
-        element.addProperty("id", src.id);
         element.addProperty("endpoint", src.endpoint);
 
         return element;

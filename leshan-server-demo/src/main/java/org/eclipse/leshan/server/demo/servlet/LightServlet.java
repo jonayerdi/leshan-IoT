@@ -61,6 +61,8 @@ public class LightServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
+            // Allow external AJAX calls
+            resp.setHeader("Access-Control-Allow-Origin","*");
             // /api/lights
             if (req.getPathInfo() == null) {
                 // all registered lights
@@ -69,8 +71,10 @@ public class LightServlet extends HttpServlet {
             }
             // ?
             String[] path = StringUtils.split(req.getPathInfo(), '/');
+            // /api/lights/
             if (path.length < 1) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid path");
+                // all registered lights
+                getLights(req, resp);
                 return;
             }
             String clientEndpoint = path[0];
@@ -134,7 +138,7 @@ public class LightServlet extends HttpServlet {
             for(int i = 0 ; i < objs.length ; i++) {
                 if(objs[i].getUrl().equals("/10250/0")) {
                     //Add to lights list
-                    ClientFormat cf = ClientFormat.create(getLightResource(c,0),c.getEndpoint());
+                    ClientFormat cf = ClientFormat.create(c.getEndpoint());
                     lights.add(cf);
                     break;
                 }
