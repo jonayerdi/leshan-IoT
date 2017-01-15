@@ -30,11 +30,7 @@ import org.eclipse.leshan.server.client.ClientRegistry;
 import org.eclipse.leshan.server.demo.cluster.RedisClientRegistry;
 import org.eclipse.leshan.server.demo.cluster.RedisObservationStore;
 import org.eclipse.leshan.server.demo.cluster.RedisSecurityRegistry;
-import org.eclipse.leshan.server.demo.servlet.ClientServlet;
-import org.eclipse.leshan.server.demo.servlet.EventServlet;
-import org.eclipse.leshan.server.demo.servlet.ObjectSpecServlet;
-import org.eclipse.leshan.server.demo.servlet.SecurityServlet;
-import org.eclipse.leshan.server.demo.servlet.LightServlet;
+import org.eclipse.leshan.server.demo.servlet.*;
 import org.eclipse.leshan.server.impl.SecurityRegistryImpl;
 import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.model.StandardModelProvider;
@@ -239,9 +235,14 @@ public class LeshanServerDemo {
         ServletHolder objectSpecServletHolder = new ServletHolder(new ObjectSpecServlet(lwServer.getModelProvider()));
         root.addServlet(objectSpecServletHolder, "/api/objectspecs/*");
 
+        //Add new light and sensor API servlets
         ServletHolder lightServletHolder = new ServletHolder(
                 new LightServlet(lwServer));
         root.addServlet(lightServletHolder, "/api/lights/*");
+
+        ServletHolder sensorServletHolder = new ServletHolder(
+                new SensorServlet(lwServer));
+        root.addServlet(sensorServletHolder, "/api/sensors/*");
 
         // Start Jetty & Leshan
         lwServer.start();

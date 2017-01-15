@@ -31,10 +31,10 @@ import java.util.Collection;
 /**
  * Created by Jon Ayerdi on 13/01/2017.
  */
-public class LightServlet extends HttpServlet {
+public class SensorServlet extends HttpServlet {
 
-    private static final String[] LIGHT_RESOURCES = {"Light ID","Device Type","Light State","User Type","User ID "
-            ,"Light Color","Low Light","Group No","Location X","Location Y","Room ID","Behavior Deployment",};
+    private static final String[] SENSOR_RESOURCES = {"Sensor ID","Device Type","Sensor State","User ID "
+            ,"Group No","Location X","Location Y","Room ID"};
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientServlet.class);
 
@@ -46,7 +46,7 @@ public class LightServlet extends HttpServlet {
 
     private final Gson gson;
 
-    public LightServlet(LwM2mServer server) {
+    public SensorServlet(LwM2mServer server) {
         this.server = server;
 
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -61,10 +61,10 @@ public class LightServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            // /api/lights
+            // /api/sensors
             if (req.getPathInfo() == null) {
-                // all registered lights
-                getLights(req, resp);
+                // all registered sensors
+                getSensors(req, resp);
                 return;
             }
             // ?
@@ -76,12 +76,12 @@ public class LightServlet extends HttpServlet {
             String clientEndpoint = path[0];
             Client client = server.getClientRegistry().get(clientEndpoint);
             if (client != null) {
-                // /api/lights/<light_endpoint>
+                // /api/Sensors/<sensor_endpoint>
                 if (path.length == 1) {
-                    getLightData(req, resp, client);
+                    getSensorData(req, resp, client);
                     return;
                 }
-                // /api/lights/<light_endpoint>/<resource_id>
+                // /api/Sensors/<Sensor_endpoint>/<resource_id>
                 int rid = 0;
                 try {
                     rid = Integer.valueOf(path[1]);
@@ -91,12 +91,12 @@ public class LightServlet extends HttpServlet {
                     return;
                 }
                 if (path.length == 2) {
-                    getLightData(req, resp, client, rid);
+                    getSensorData(req, resp, client, rid);
                     return;
                 }
-                // /api/lights/<light_endpoint>/<resource_id>/set
+                // /api/Sensors/<Sensor_endpoint>/<resource_id>/set
                 if (path.length == 3 && path[2].equals("set")) {
-                    setLightData(req, resp, client, rid);
+                    setSensorData(req, resp, client, rid);
                     return;
                 }
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -124,96 +124,96 @@ public class LightServlet extends HttpServlet {
         }
     }
 
-    // /api/lights
-    //Get the list of registered light devices
-    public void getLights(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    // /api/sensors
+    //Get the list of registered Sensor devices
+    public void getSensors(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Collection<Client> clients = server.getClientRegistry().allClients();
-        ArrayList<ClientFormat> lights = new ArrayList<>();
+        ArrayList<ClientFormat> sensors = new ArrayList<>();
         for(Client c : clients) {
             LinkObject[] objs = c.getObjectLinks();
             for(int i = 0 ; i < objs.length ; i++) {
-                if(objs[i].getUrl().equals("/10250/0")) {
-                    //Add to lights list
-                    ClientFormat cf = ClientFormat.create(getLightResource(c,0),c.getEndpoint());
-                    lights.add(cf);
+                if(objs[i].getUrl().equals("/10350/0")) {
+                    //Add to sensors list
+                    ClientFormat cf = ClientFormat.create(getSensorResource(c,0),c.getEndpoint());
+                    sensors.add(cf);
                     break;
                 }
             }
         }
         //format list to json and send
-        String json = this.gson.toJson(lights.toArray(new ClientFormat[] {}));
+        String json = this.gson.toJson(sensors.toArray(new ClientFormat[] {}));
         resp.setContentType("application/json");
         resp.getOutputStream().write(json.getBytes("UTF-8"));
         resp.setStatus(HttpServletResponse.SC_OK);
         return;
     }
 
-    // /api/lights/<light_endpoint>
-    // Get all the LWM2M light data from light_endpoint
-    public void getLightData(HttpServletRequest req, HttpServletResponse resp, Client client) throws Exception {
+    // /api/Sensors/<sensor_endpoint>
+    // Get all the LWM2M Sensor data from sensor_endpoint
+    public void getSensorData(HttpServletRequest req, HttpServletResponse resp, Client client) throws Exception {
         resp.setContentType("application/json");
         String json = "{";
-        for(int i = 0 ; i < 12 ; i++) {
+        for(int i = 0 ; i < 8 ; i++) {
             json += "\"";
-            json += LIGHT_RESOURCES[i];
+            json += SENSOR_RESOURCES[i];
             json += "\":";
             json += "\"";
-            json += getLightResource(client,i);
+            json += getSensorResource(client,i);
             json += "\"";
-            if(i!=11) json += ",";
+            if(i!=7) json += ",";
         }
         json += "}";
         resp.getOutputStream().write(json.getBytes("UTF-8"));
         resp.setStatus(HttpServletResponse.SC_OK);
     }
 
-    // /api/lights/<light_endpoint>/<resource_id>
-    // Get the LWM2M light data from light_endpoint
-    public void getLightData(HttpServletRequest req, HttpServletResponse resp, Client client, int rid) throws Exception {
+    // /api/Sensors/<sensor_endpoint>/<resource_id>
+    // Get the LWM2M sensor data from Sensor_endpoint
+    public void getSensorData(HttpServletRequest req, HttpServletResponse resp, Client client, int rid) throws Exception {
         resp.setContentType("application/json");
         String json = "{";
         json += "\"";
-        json += LIGHT_RESOURCES[rid];
+        json += SENSOR_RESOURCES[rid];
         json += "\":";
         json += "\"";
-        json += getLightResource(client,rid);
+        json += getSensorResource(client,rid);
         json += "\"";
         json += "}";
         resp.getOutputStream().write(json.getBytes("UTF-8"));
         resp.setStatus(HttpServletResponse.SC_OK);
     }
 
-    // /api/lights/<light_endpoint>/<resource_id>/set
-    // Set the LWM2M light data from light_endpoint
-    public void setLightData(HttpServletRequest req, HttpServletResponse resp, Client client, int rid) throws Exception {
+    // /api/sensors/<sensor_endpoint>/<resource_id>/set
+    // Set the LWM2M sensor data from sensor_endpoint
+    public void setSensorData(HttpServletRequest req, HttpServletResponse resp, Client client, int rid) throws Exception {
         String value = req.getParameter("value");
         if(value==null) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().append("No value attribute").flush();
             return;
         }
-        if(rid<2 || rid>13) {
+        if(rid<2 || rid>7) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().append("Cannot write to resource, bad id").flush();
             return;
         }
-        setLightResource(client,rid,value);
+        setSensorResource(client,rid,value);
         resp.setStatus(HttpServletResponse.SC_OK);
     }
 
-    public String getLightResource(Client c, int rid) throws Exception {
+    public String getSensorResource(Client c, int rid) throws Exception {
         // create & process request for resource
-        ReadRequest request = new ReadRequest(null, "/10250/0/"+rid);
+        ReadRequest request = new ReadRequest(null, "/10350/0/"+rid);
         ReadResponse cResponse = server.send(c, request, TIMEOUT);
         String val = "";
         if(cResponse!=null) val = ((LwM2mResource)cResponse.getContent()).getValue().toString();
         return val;
     }
 
-    public void setLightResource(Client c, int rid, String value) throws Exception {
+    public void setSensorResource(Client c, int rid, String value) throws Exception {
         // create & process request for resource
         WriteRequest request = new WriteRequest(WriteRequest.Mode.REPLACE, null
-                , "/10250/0/"+rid, cast(rid,value));
+                , "/10350/0/"+rid, cast(rid,value));
         WriteResponse cResponse = server.send(c, request, TIMEOUT);
         if(cResponse==null || cResponse.getCode()!= ResponseCode.CHANGED)
             throw new RequestFailedException("Request failed");
@@ -221,13 +221,11 @@ public class LightServlet extends HttpServlet {
 
     public LwM2mSingleResource cast(int rid, String value) throws Exception {
         switch(rid) {
-            case 6:
-                return LwM2mSingleResource.newBooleanResource(rid, Boolean.valueOf(value));
-            case 7:
+            case 4:
                 return LwM2mSingleResource.newIntegerResource(rid, Integer.valueOf(value));
-            case 8:
+            case 5:
                 return LwM2mSingleResource.newFloatResource(rid, Float.valueOf(value));
-            case 9:
+            case 6:
                 return LwM2mSingleResource.newFloatResource(rid, Float.valueOf(value));
             default:
                 return LwM2mSingleResource.newStringResource(rid, value);

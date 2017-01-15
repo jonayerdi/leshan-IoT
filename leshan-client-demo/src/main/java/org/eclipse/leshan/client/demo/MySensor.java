@@ -17,9 +17,9 @@ public class MySensor extends BaseInstanceEnabler {
 
     private static final Logger LOG = LoggerFactory.getLogger(MyDevice.class);
 
-    int groupNo;
+    long groupNo;
     String sensorId, deviceType, sensorState, userId, roomId;
-    float locationX, locationY;
+    double locationX, locationY;
 
     public MySensor() {
         sensorId = "Sensor" + new Random().nextInt(1000);
@@ -78,15 +78,15 @@ public class MySensor extends BaseInstanceEnabler {
                 fireResourcesChange(resourceid);
                 return WriteResponse.success();
             case 4:
-                groupNo = (Integer)value.getValue();
+                groupNo = (Long)value.getValue();
                 fireResourcesChange(resourceid);
                 return WriteResponse.success();
             case 5:
-                locationX = (Float)value.getValue();
+                locationX = (Double)value.getValue();
                 fireResourcesChange(resourceid);
                 return WriteResponse.success();
             case 6:
-                locationY = (Float)value.getValue();
+                locationY = (Double)value.getValue();
                 fireResourcesChange(resourceid);
                 return WriteResponse.success();
             case 7:

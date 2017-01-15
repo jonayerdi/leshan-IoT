@@ -10,7 +10,7 @@ import java.lang.reflect.Type;
 /**
  * Created by Jon Ayerdi on 13/01/2017.
  */
-public class LightClientSerializer implements JsonSerializer<ClientFormat> {
+public class ClientFormatSerializer implements JsonSerializer<ClientFormat> {
 
     public JsonElement serialize(ClientFormat src, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject element = new JsonObject();
