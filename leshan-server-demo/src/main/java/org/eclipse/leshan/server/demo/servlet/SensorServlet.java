@@ -36,7 +36,7 @@ public class SensorServlet extends HttpServlet {
     private static final String[] SENSOR_RESOURCES = {"Sensor ID","Device Type","Sensor State","User ID "
             ,"Group No","Location X","Location Y","Room ID"};
 
-    private static final Logger LOG = LoggerFactory.getLogger(ClientServlet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SensorServlet.class);
 
     private static final long TIMEOUT = 5000; // ms
 

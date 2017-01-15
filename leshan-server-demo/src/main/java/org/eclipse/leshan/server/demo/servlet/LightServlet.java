@@ -36,7 +36,7 @@ public class LightServlet extends HttpServlet {
     private static final String[] LIGHT_RESOURCES = {"Light ID","Device Type","Light State","User Type","User ID "
             ,"Light Color","Low Light","Group No","Location X","Location Y","Room ID","Behavior Deployment",};
 
-    private static final Logger LOG = LoggerFactory.getLogger(ClientServlet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LightServlet.class);
 
     private static final long TIMEOUT = 5000; // ms
 

@@ -244,9 +244,20 @@ public class LeshanServerDemo {
                 new SensorServlet(lwServer));
         root.addServlet(sensorServletHolder, "/api/sensors/*");
 
+        //Userapp server
+        Server userappServer = new Server(80);
+        WebAppContext userappRoot = new WebAppContext();
+        userappRoot.setContextPath("/");
+        userappRoot.setResourceBase(LeshanServerDemo.class.getClassLoader().getResource("userapp").toExternalForm());
+        userappRoot.setParentLoaderPriority(true);
+        userappServer.setHandler(userappRoot);
+        userappServer.start();
+
         // Start Jetty & Leshan
         lwServer.start();
         server.start();
-        LOG.info("Web server started at {}.", server.getURI());
+
+        LOG.info("Userapp server started at {}.", userappServer.getURI());
+        LOG.info("Leshan server started at {}.", server.getURI());
     }
 }
