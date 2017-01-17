@@ -244,6 +244,22 @@ public class LeshanServerDemo {
                 new SensorServlet(lwServer));
         root.addServlet(sensorServletHolder, "/api/sensors/*");
 
+        //Add servlet to change users and passwords
+        UsersServlet usersServlet = new UsersServlet();
+        ServletHolder usersServletHolder = new ServletHolder(
+                usersServlet);
+        root.addServlet(usersServletHolder, "/api/users/*");
+
+        //Add servlet to register observers
+        ServletHolder observeServletHolder = new ServletHolder(
+                new ObserveServlet(lwServer));
+        root.addServlet(observeServletHolder, "/api/register/*");
+
+        //Add servlet to register observers
+        ServletHolder userappServletHolder = new ServletHolder(
+                new UserappServlet(usersServlet));
+        root.addServlet(userappServletHolder, "/api/userapp/lights/*");
+
         //Userapp server
         Server userappServer = new Server(80);
         WebAppContext userappRoot = new WebAppContext();

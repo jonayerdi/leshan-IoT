@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by Jon Ayerdi on 15/01/2017.
@@ -16,8 +17,10 @@ public class UserappServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientServlet.class);
 
-    public UserappServlet() {
+    UsersServlet usersServlet;
 
+    public UserappServlet(UsersServlet us) {
+        usersServlet = us;
     }
 
     /**
@@ -25,6 +28,14 @@ public class UserappServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
     }
 
