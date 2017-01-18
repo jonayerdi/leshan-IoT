@@ -18,9 +18,11 @@ public class UserappServlet extends HttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(ClientServlet.class);
 
     UsersServlet usersServlet;
+    ObserveServlet observeServlet;
 
-    public UserappServlet(UsersServlet us) {
+    public UserappServlet(UsersServlet us, ObserveServlet os) {
         usersServlet = us;
+        observeServlet = os;
     }
 
     /**

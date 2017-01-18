@@ -44,11 +44,13 @@ public class ObserveServlet extends HttpServlet implements ClientRegistryListene
 
     LeshanServer server;
     Set<String> observers;
+    Map<String,String> owners;
 
     public ObserveServlet(LeshanServer server) {
         this.server = server;
         observers = new HashSet<>();
-        //server.getClientRegistry().addListener(this);
+        owners = Collections.synchronizedMap(new HashMap<String,String>());
+        server.getClientRegistry().addListener(this);
         server.getObservationRegistry().addListener(this);
         observers.add("localhost:5434");
     }
@@ -145,6 +147,9 @@ public class ObserveServlet extends HttpServlet implements ClientRegistryListene
                     // create & process observe request for resource
                     ObserveRequest request = new ObserveRequest(10250,0);
                     ObserveResponse cResponse = server.send(client, request);
+                    //Register owner
+                    String owner = ((LwM2mObjectInstance)cResponse.getContent()).getResource(4).getValue().toString();
+                    owners.put(client.getEndpoint(),owner);
                     if(cResponse==null)
                         throw new RequestFailedException("10250 observe failed");
                 }
@@ -159,6 +164,10 @@ public class ObserveServlet extends HttpServlet implements ClientRegistryListene
         } catch (Exception e) {
             LOG.warn("Exception in registered()",e);
         }
+    }
+
+    public Map<String,String> getOwners() {
+        return owners;
     }
 
     @Override
@@ -185,6 +194,8 @@ public class ObserveServlet extends HttpServlet implements ClientRegistryListene
                 String[] values = new String[LIGHT_RESOURCES.length];
                 for(int i = 0 ; i < LIGHT_RESOURCES.length ; i++)
                     values[i] = ((LwM2mObjectInstance)mostRecentValue).getResource(i).getValue().toString();
+                //Save new owner of the light
+                owners.put(endpoint,values[4]);
                 sendLightData(endpoint,values);
             }
             else if(observation.getPath().toString().equals("/10350/0")) {

@@ -251,13 +251,14 @@ public class LeshanServerDemo {
         root.addServlet(usersServletHolder, "/api/users/*");
 
         //Add servlet to register observers
+        ObserveServlet observeServlet = new ObserveServlet(lwServer);
         ServletHolder observeServletHolder = new ServletHolder(
-                new ObserveServlet(lwServer));
+                observeServlet);
         root.addServlet(observeServletHolder, "/api/register/*");
 
         //Add servlet to register observers
         ServletHolder userappServletHolder = new ServletHolder(
-                new UserappServlet(usersServlet));
+                new UserappServlet(usersServlet, observeServlet));
         root.addServlet(userappServletHolder, "/api/userapp/lights/*");
 
         //Userapp server
