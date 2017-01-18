@@ -4,6 +4,7 @@ import org.eclipse.leshan.LinkObject;
 import org.eclipse.leshan.ResponseCode;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
+import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
 import org.eclipse.leshan.core.observation.Observation;
 import org.eclipse.leshan.core.request.ObserveRequest;
@@ -52,7 +53,7 @@ public class ObserveServlet extends HttpServlet implements ClientRegistryListene
         owners = Collections.synchronizedMap(new HashMap<String,String>());
         server.getClientRegistry().addListener(this);
         server.getObservationRegistry().addListener(this);
-        observers.add("localhost:5434");
+        //observers.add("localhost:5434");
     }
 
     /**
@@ -80,36 +81,30 @@ public class ObserveServlet extends HttpServlet implements ClientRegistryListene
     }
 
     // Send all the LWM2M light data from light_endpoint
-    public void sendLightData(String endpoint, String[] values) throws Exception {
+    public void sendLightData(String endpoint, int id, String value) throws Exception {
         String url = "/api/observe/light/"+endpoint;
         String json = "{";
-        for(int i = 0 ; i < LIGHT_RESOURCES.length ; i++) {
-            json += "\"";
-            json += LIGHT_RESOURCES[i];
-            json += "\":";
-            json += "\"";
-            json += values[i];
-            json += "\"";
-            if(i!=11) json += ",";
-        }
+        json += "\"";
+        json += LIGHT_RESOURCES[id];
+        json += "\":";
+        json += "\"";
+        json += value;
+        json += "\"";
         json += "}";
         for(String observer : observers)
-            sendDataObserver(observer+url,json);
+            sendDataObserver("http://"+observer+url,json);
     }
 
     // Send all the LWM2M sensor data from sensor_endpoint
-    public void sendSensorData(String endpoint, String[] values) throws Exception {
+    public void sendSensorData(String endpoint, int id, String value) throws Exception {
         String url = "/api/observe/sensor/"+endpoint;
         String json = "{";
-        for(int i = 0 ; i < SENSOR_RESOURCES.length ; i++) {
-            json += "\"";
-            json += SENSOR_RESOURCES[i];
-            json += "\":";
-            json += "\"";
-            json += values[i];
-            json += "\"";
-            if(i!=7) json += ",";
-        }
+        json += "\"";
+        json += SENSOR_RESOURCES[id];
+        json += "\":";
+        json += "\"";
+        json += value;
+        json += "\"";
         json += "}";
         for(String observer : observers)
             sendDataObserver("http://"+observer+url,json);
@@ -139,31 +134,41 @@ public class ObserveServlet extends HttpServlet implements ClientRegistryListene
     //LWM2M ClientRegistryListener
 
     @Override
-    public void registered(Client client) {
-        try {
-            LinkObject[] objs = client.getObjectLinks();
-            for(int i = 0 ; i < objs.length ; i++) {
-                if(objs[i].getUrl().equals("/10250/0")) {
-                    // create & process observe request for resource
-                    ObserveRequest request = new ObserveRequest(10250,0);
-                    ObserveResponse cResponse = server.send(client, request);
-                    //Register owner
-                    String owner = ((LwM2mObjectInstance)cResponse.getContent()).getResource(4).getValue().toString();
-                    owners.put(client.getEndpoint(),owner);
-                    if(cResponse==null)
-                        throw new RequestFailedException("10250 observe failed");
-                }
-                else if(objs[i].getUrl().equals("/10350/0")) {
-                    // create & process observe request for resource
-                    ObserveRequest request = new ObserveRequest(10350,0);
-                    ObserveResponse cResponse = server.send(client, request);
-                    if(cResponse==null)
-                        throw new RequestFailedException("10350 observe failed");
+    public void registered(Client c) {
+        final Client client = c;
+        new Thread() {
+            public void run() {
+                try {
+                    Thread.sleep(3000);
+                    LinkObject[] objs = client.getObjectLinks();
+                    for(int i = 0 ; i < objs.length ; i++) {
+                        if(objs[i].getUrl().equals("/10250/0")) {
+                            // create & process observe request for resource
+                            for(int j = 0 ; j < LIGHT_RESOURCES.length ; j++) {
+                                ObserveResponse cResponse = server.send(client, new ObserveRequest(10250,0,j));
+                                if(j==4) {
+                                    //Register owner
+                                    String owner = ((LwM2mSingleResource)cResponse.getContent()).getValue().toString();
+                                    owners.put(client.getEndpoint(),owner);
+                                }
+                                if(cResponse==null)
+                                    LOG.warn("10250 observe failed");
+                            }
+                        }
+                        else if(objs[i].getUrl().equals("/10350/0")) {
+                            // create & process observe request for resource
+                            for(int j = 0 ; j < SENSOR_RESOURCES.length ; j++) {
+                                ObserveResponse cResponse = server.send(client, new ObserveRequest(10350,0,j));
+                                if(cResponse==null)
+                                    LOG.warn("10350 observe failed");
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    LOG.warn("Exception in registered()",e);
                 }
             }
-        } catch (Exception e) {
-            LOG.warn("Exception in registered()",e);
-        }
+        }.start();
     }
 
     public Map<String,String> getOwners() {
@@ -189,21 +194,21 @@ public class ObserveServlet extends HttpServlet implements ClientRegistryListene
     @Override
     public void newValue(Observation observation, LwM2mNode mostRecentValue, List<TimestampedLwM2mNode> timestampedValues) {
         try {
-            if(observation.getPath().toString().equals("/10250/0")) {
+            if(observation.getPath().toString().startsWith("/10250/0")) {
                 String endpoint = server.getClientRegistry().findByRegistrationId(observation.getRegistrationId()).getEndpoint();
-                String[] values = new String[LIGHT_RESOURCES.length];
-                for(int i = 0 ; i < LIGHT_RESOURCES.length ; i++)
-                    values[i] = ((LwM2mObjectInstance)mostRecentValue).getResource(i).getValue().toString();
-                //Save new owner of the light
-                owners.put(endpoint,values[4]);
-                sendLightData(endpoint,values);
+                int id = ((LwM2mSingleResource)mostRecentValue).getId();
+                String value = ((LwM2mSingleResource)mostRecentValue).getValue().toString();
+                if(id==4) {
+                    //Save new owner of the light
+                    owners.put(endpoint,value);
+                }
+                sendLightData(endpoint,id,value);
             }
-            else if(observation.getPath().toString().equals("/10350/0")) {
+            else if(observation.getPath().toString().startsWith("/10350/0")) {
                 String endpoint = server.getClientRegistry().findByRegistrationId(observation.getRegistrationId()).getEndpoint();
-                String[] values = new String[SENSOR_RESOURCES.length];
-                for(int i = 0 ; i < SENSOR_RESOURCES.length ; i++)
-                    values[i] = ((LwM2mObjectInstance)mostRecentValue).getResource(i).getValue().toString();
-                sendSensorData(endpoint,values);
+                int id = ((LwM2mSingleResource)mostRecentValue).getId();
+                String value = ((LwM2mSingleResource)mostRecentValue).getValue().toString();
+                sendSensorData(endpoint,id,value);
             }
         } catch (Exception e) {
             LOG.warn("Exception in newValue()",e);

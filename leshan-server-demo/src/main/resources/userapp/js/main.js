@@ -1,11 +1,40 @@
 
 var address = "Equipo:8080";
+var $login;
+var $main;
+var $user;
+var $password;
+var $loginError;
 var RS;
 var GS;
 var BS;
 var $endpoint;
 var $lowLight;
 var endpointsUpdateIntervalID;
+
+function logout() {
+	$user.val("");
+	$password.val("");
+	$login.css("visibility","visible");
+	$main.css("visibility","collapse");
+}
+
+function submitLogin() {
+	$.ajax({
+		url: 'http://'+address+'/api/userapp/lights?user='+$user.val()+'&password='+$password.val(),
+		success: function(data) {
+			$loginError.css("visibility","collapse");
+			$login.css("visibility","collapse");
+			$main.css("visibility","visible");
+			var json = eval(data);
+			visualizeEndpoints(json);
+			
+		},
+		error: function(data) { 
+			$loginError.css("visibility","visible");
+		}
+	});
+}
 
 function updateLightValues() {
 	$.ajax({
@@ -47,12 +76,12 @@ function visualizeEndpoints(json) {
 
 function updateEndpoints() {
 	$.ajax({
-		url: 'http://'+address+'/api/lights',
+		url: 'http://'+address+'/api/userapp/lights?user='+$user.val()+'&password='+$password.val(),
 		success: function(data) {
 			var json = eval(data);
 			visualizeEndpoints(json);
 		},
-		failure: function(data) { 
+		error: function(data) { 
 			
 		}
 	}); 
@@ -84,20 +113,25 @@ function colorChange() {
 }
 
 $(document).ready(function() {
+	$login = $('#login');
+	$main = $('#main');
+	$user = $('#user');
+	$password = $('#password');
+	$loginError = $('#loginError');
 	$endpoint = $('#endpoint');
 	$endpoints_list = $('#endpoints_list');
 	//Set interval for endpoints list update
 	endpointsUpdateIntervalID = setInterval(function(){updateEndpoints()}, 500);
 	RS = $('#RSlider').slider();
-	RS.on('slide', function(ev){
+	RS.on('slideStop', function(ev){
 		colorChange();
 	});
 	GS = $('#GSlider').slider();
-	GS.on('slide', function(ev){
+	GS.on('slideStop', function(ev){
 		colorChange();
 	});	
 	BS = $('#BSlider').slider();
-	BS.on('slide', function(ev){
+	BS.on('slideStop', function(ev){
 		colorChange();
 	});	
 	$lowLight = $('#lowLight');
