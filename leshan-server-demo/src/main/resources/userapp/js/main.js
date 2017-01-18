@@ -1,5 +1,5 @@
 
-var address = "localhost:8080";
+var address = "Equipo:8080";
 var RS;
 var GS;
 var BS;

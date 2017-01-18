@@ -261,7 +261,7 @@ public class LeshanServerDemo {
         root.addServlet(userappServletHolder, "/api/userapp/lights/*");
 
         //Userapp server
-        Server userappServer = new Server(80);
+        Server userappServer = new Server(8090);
         WebAppContext userappRoot = new WebAppContext();
         userappRoot.setContextPath("/");
         userappRoot.setResourceBase(LeshanServerDemo.class.getClassLoader().getResource("userapp").toExternalForm());

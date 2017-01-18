@@ -24,12 +24,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Created by Jon Ayerdi on 15/01/2017.
@@ -44,14 +43,14 @@ public class ObserveServlet extends HttpServlet implements ClientRegistryListene
             ,"Group No","Location X","Location Y","Room ID"};
 
     LeshanServer server;
-    Vector<String> observers;
+    Set<String> observers;
 
     public ObserveServlet(LeshanServer server) {
         this.server = server;
-        observers = new Vector<>();
-        server.getClientRegistry().addListener(this);
+        observers = new HashSet<>();
+        //server.getClientRegistry().addListener(this);
         server.getObservationRegistry().addListener(this);
-        //observers.add("localhost:5434");
+        observers.add("localhost:5434");
     }
 
     /**
@@ -114,18 +113,25 @@ public class ObserveServlet extends HttpServlet implements ClientRegistryListene
             sendDataObserver("http://"+observer+url,json);
     }
 
-    public void sendDataObserver(String url, String json) throws Exception {
-        URL mUrl = new URL(url);
-        HttpURLConnection urlConn = (HttpURLConnection) mUrl.openConnection();
-        urlConn.setDoOutput(true);
-        urlConn.setRequestMethod("POST");
-        urlConn.addRequestProperty("Content-Type", "application/json");
-        urlConn.setRequestProperty("Content-Length", Integer.toString(json.length()));
-        urlConn.setRequestProperty("charset", "utf-8");
-        urlConn.connect();
-        urlConn.getOutputStream().write(json.getBytes("UTF8"));
-        urlConn.getOutputStream().flush();
-        urlConn.getOutputStream().close();
+    public void sendDataObserver(String url, String json) {
+        try {
+            LOG.info("Sending update to ["+url+"]");
+            URL mUrl = new URL(url);
+            HttpURLConnection urlConn = (HttpURLConnection) mUrl.openConnection();
+            urlConn.setDoOutput(true);
+            urlConn.setRequestMethod("POST");
+            urlConn.addRequestProperty("Content-Type", "application/json");
+            urlConn.setRequestProperty("Content-Length", Integer.toString(json.length()));
+            urlConn.setRequestProperty("charset", "utf-8");
+            urlConn.connect();
+            DataOutputStream dos = new DataOutputStream(urlConn.getOutputStream());
+            dos.writeBytes(json);
+            dos.flush();
+            dos.close();
+            urlConn.getResponseCode();
+        } catch (Exception e) {
+            LOG.warn("Exception in sendDataObserver()",e);
+        }
     }
 
     //LWM2M ClientRegistryListener
