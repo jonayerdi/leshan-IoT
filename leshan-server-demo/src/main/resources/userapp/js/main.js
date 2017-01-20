@@ -32,6 +32,7 @@ function submitLogin() {
 		},
 		error: function(data) { 
 			$loginError.css("visibility","visible");
+			$endpoints_list.empty();
 		}
 	});
 }
@@ -82,7 +83,7 @@ function updateEndpoints() {
 			visualizeEndpoints(json);
 		},
 		error: function(data) { 
-			
+			$endpoints_list.empty();
 		}
 	}); 
 }
